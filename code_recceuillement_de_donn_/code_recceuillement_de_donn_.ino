@@ -6,12 +6,14 @@
 #include <SPI.h>
 #include <SD.h>
 
+// plus tard : ajouter pitot
+
 const byte TRIGGER_PIN = 5; 
 const byte ECHO_PIN = 3;
 static const int RXPin = 2, TXPin = 10;
 static const uint32_t GPSBaud = 4800;
-const unsigned long MEASURE_TIMEOUT = 25000UL; // 25ms = ~8m à 340m/s
-const float SOUND_SPEED = 340.0 / 1000;
+//const unsigned long MEASURE_TIMEOUT = 25000UL; // 25ms = ~8m à 340m/s
+//const float SOUND_SPEED = 340.0 / 1000;
 double ailerons = 0;
 double profondeur = 0; 
 double derive=0;
@@ -49,7 +51,7 @@ void setup() {
   delay (100);
   myFile = SD.open("test.csv", FILE_WRITE);
   if (myFile) {
-  myFile.println("commande ailerons,commande dérive,commande profondeur,commande moteur,Distance du sol (mm),AccX,AccY,AccZ,GyroX,GyroY,GyroZ,AngleX,Angley,AngleZ,lattitude,longitude,heurs,minutes,secondes,centisecondes");
+  myFile.println("commande ailerons,commande dérive,commande profondeur,commande moteur,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,AngleX,Angley,AngleZ,lattitude,longitude,heurs,minutes,secondes,centisecondes");  // Distance du sol (mm),
   delay(100);
   myFile.close();
   }
@@ -79,21 +81,25 @@ void loop() {
   moteur = pulseIn(2 , HIGH);
   myFile.print(moteur);
   myFile.print(",");
-  /* 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER */
+  
+  /*  Ancien code lors de l'utilisation du capteur ultrason
+  
+  // 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER
   digitalWrite(TRIGGER_PIN, HIGH);
   delayMicroseconds(10);
   digitalWrite(TRIGGER_PIN, LOW);
   
-  /* 2. Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe) */
+  // 2. Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe)
   long measure = pulseIn(ECHO_PIN, HIGH, MEASURE_TIMEOUT);
    
-  /* 3. Calcul la distance à partir du temps mesuré */
+  // 3. Calcul la distance à partir du temps mesuré
   float distance_mm = measure / 2.0 * SOUND_SPEED;
    
-  /* Affiche les résultats en mm, cm et m */
+  // Affiche les résultats en mm, cm et m
   myFile.print(distance_mm);
   myFile.print(",");
   JY901.receiveSerialData(); 
+  */
   
   myFile.print(JY901.getAccX());
   myFile.print(",");
